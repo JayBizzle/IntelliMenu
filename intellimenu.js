@@ -18,7 +18,7 @@
 					showWhenFromBottom: 0, 			// how far from the bottom of the page should we before before showing the menu
 					unhideOnScrollUp: true,			// Should we show the menu when the user scrolls up?
 					scrollUpUnhideSensitivity: 200,	// How far does the user need to scroll up before showing the menu. unhideOnScrollUp need to be true
-					minimumAvailableHeight:400		// Only do the hiding and showing if there is more than X amount of pixels available to scroll. Stops sort pages looking weird when menu hides and displays in quick succession
+					minimumAvailableHeight:400		// Only do the hiding and showing if there is more than X amount of pixels available to scroll. Stops short pages looking weird when menu hides and displays in quick succession
 		};
 
 		// The actual plugin constructor
@@ -65,11 +65,13 @@
 					
 					if(_this.documentHeight > _this.settings.minimumAvailableHeight) {
 
-						if(_this.menuVisible) {
-							if(s >= _this.settings.hideWhenScrolled) {
-								$('html').addClass('sticky-menu-hidden');
-								_this.menuVisible = false;
-							}
+						if(_this.menuVisible && s >= _this.settings.hideWhenScrolled &&  s>_this.lastScrollPosition) {
+							$('html').addClass('sticky-menu-hidden');
+							_this.menuVisible = false;
+							_this.trigger = null;
+						} else if(_this.menuVisible && (s <= (_this.documentHeight - _this.settings.showWhenFromBottom) && _this.trigger != 'scrollUp')) {
+							$('html').addClass('sticky-menu-hidden');
+							_this.menuVisible = false;
 						}
 						
 						if(!_this.menuVisible) {
@@ -79,6 +81,7 @@
 								if(_this.scrollUpCounter >= _this.settings.scrollUpUnhideSensitivity) {
 									$('html').removeClass('sticky-menu-hidden');
 									_this.menuVisible = true;
+									_this.trigger = 'scrollUp';
 								}
 							} else {
 								_this.scrollUpCounter = 0;
